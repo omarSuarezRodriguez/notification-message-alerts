@@ -1,17 +1,85 @@
 package notification;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import shadow.ShadowRenderer;
+
 /**
  *
  * @author Omar
  */
-public class Notification extends javax.swing.JPanel {
+public class Notification extends javax.swing.JComponent {
 
-    /**
-     * Creates new form Notification
-     */
+    
+    private BufferedImage imageShadow;
+    private int shadowSize = 6;
+    
+    
+    
     public Notification() {
         initComponents();
+        init();
     }
+
+    
+    private void init() {
+        setBackground(Color.WHITE);
+    }
+    
+    
+    @Override
+    public void paint(Graphics grphcs) {
+        
+        Graphics2D g2 = (Graphics2D)grphcs.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(getBackground());
+        g2.drawImage(imageShadow, 0, 0, null);
+        int x = shadowSize;
+        int y = shadowSize;
+        int width = getWidth() - shadowSize * 2;
+        int height = getHeight() - shadowSize * 2;
+        g2.fillRect(x, y, width, height);
+        
+        g2.dispose();
+        super.paint(grphcs); 
+    }
+
+
+    
+    @Override
+    public void setBounds(int i, int i1, int i2, int i3) {
+        super.setBounds(i, i1, i2, i3);
+        createImageShadow();
+    }
+    
+    
+    
+    private void createImageShadow() {
+        
+        imageShadow = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = imageShadow.createGraphics();
+        g2.drawImage(createShadow(), 0, 0, null);
+        g2.dispose();
+        
+    }
+    
+    
+    
+    private BufferedImage createShadow() {
+        
+        BufferedImage img = new BufferedImage(getWidth() - shadowSize * 2, 
+                getHeight() - shadowSize * 2, BufferedImage.TYPE_INT_ARGB);
+        
+        Graphics2D g2 = img.createGraphics();
+        g2.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g2.dispose();
+        return new ShadowRenderer(shadowSize, 0.3f, new Color(100, 100, 100)).createShadow(img);
+        
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -22,19 +90,90 @@ public class Notification extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabelIcon = new javax.swing.JLabel();
+        jPanel = new javax.swing.JPanel();
+        jLabelMessage = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        cmdClose = new javax.swing.JButton();
+
+        jLabelIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/sucess.png"))); // NOI18N
+
+        jPanel.setOpaque(false);
+
+        jLabelMessage.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jLabelMessage.setText("Message");
+
+        jLabel1.setText("jLabel1");
+
+        javax.swing.GroupLayout jPanelLayout = new javax.swing.GroupLayout(jPanel);
+        jPanel.setLayout(jPanelLayout);
+        jPanelLayout.setHorizontalGroup(
+            jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelLayout.createSequentialGroup()
+                .addGroup(jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelMessage)
+                    .addComponent(jLabel1))
+                .addGap(0, 234, Short.MAX_VALUE))
+        );
+        jPanelLayout.setVerticalGroup(
+            jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelLayout.createSequentialGroup()
+                .addComponent(jLabelMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1))
+        );
+
+        cmdClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/close.png"))); // NOI18N
+        cmdClose.setBorder(null);
+        cmdClose.setContentAreaFilled(false);
+        cmdClose.setFocusable(false);
+        cmdClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCloseActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 448, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabelIcon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(10, 10, 10)
+                .addComponent(jPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmdClose)
+                .addGap(15, 15, 15))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 80, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jLabelIcon, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                .addGap(10, 10, 10))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cmdClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmdCloseActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cmdClose;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelIcon;
+    private javax.swing.JLabel jLabelMessage;
+    private javax.swing.JPanel jPanel;
     // End of variables declaration//GEN-END:variables
 }
