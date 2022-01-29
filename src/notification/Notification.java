@@ -1,10 +1,15 @@
 package notification;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import javax.swing.JDialog;
+import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.TimingTarget;
+import org.jdesktop.animation.timing.TimingTargetAdapter;
 import shadow.ShadowRenderer;
 
 /**
@@ -14,19 +19,190 @@ import shadow.ShadowRenderer;
 public class Notification extends javax.swing.JComponent {
 
     
+    private JDialog dialog;
+    private Animator animator;
+    private final Frame fram;
+    private boolean showing;
+    private Thread thread;
+    private int animate = 10;
     private BufferedImage imageShadow;
     private int shadowSize = 6;
+    private Type type;
+    private Location location;
     
     
-    
-    public Notification() {
+    public Notification(Frame fram, Type type, Location location, String message) {
+        this.fram = fram;
+        this.type = type;
+        this.location = location;
+        
         initComponents();
-        init();
+        init(message);
+        initAnimator();
     }
 
     
-    private void init() {
+    private void init(String message) {
         setBackground(Color.WHITE);
+        dialog = new JDialog(fram);
+        dialog.setUndecorated(true);
+        dialog.setFocusableWindowState(false);
+        dialog.setBackground(new Color(0, 0, 0, 0));
+        dialog.add(this);
+        dialog.setSize(getPreferredSize());
+        
+        if (type == Type.SUCCESS) {
+            jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/sucess.png")));
+            jLabelMessage.setText("Success");
+        } else if ( type == Type.INFO) {
+            jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/info.png")));
+            jLabelMessage.setText("Info");
+        } else {
+            jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/warning.png")));
+            jLabelMessage.setText("Warning");
+        }
+        
+        jLabelMessageText.setText(message);
+        
+    }
+    
+    
+    
+    private void initAnimator() {
+        
+        TimingTarget target = new TimingTargetAdapter(){
+            private int x;
+            private int top;
+            private boolean top_to_bot;
+            
+            @Override
+            public void timingEvent(float fraction) {
+                if (showing) {
+                    float alpha = 1f - fraction;
+                    int y = (int)((1f - fraction) * animate);
+                    if (top_to_bot) {
+                        dialog.setLocation(x, top + y);
+                    } else {
+                        dialog.setLocation(x, top - y);
+                    }
+                    dialog.setOpacity(alpha);
+                } else {
+                    float alpha = fraction;
+                    int y = (int)(fraction * animate);
+                    if (top_to_bot) {
+                        dialog.setLocation(x, top + y);
+                    } else {
+                        dialog.setLocation(x, top - y);
+                    }
+                    dialog.setOpacity(alpha);
+                }
+            }
+
+            @Override
+            public void begin() {
+                
+                if (!showing) {
+                    dialog.setOpacity(0f);
+                    int margin = 10;
+                    int y = 0;
+                    if (location == Location.TOP_CENTER) {
+                        x = fram.getX() + ((fram.getWidth() - dialog.getWidth()) / 2);
+                        y = fram.getY();
+                        top_to_bot = true;
+                        top = y + 20;
+                    } else if (location == Location.TOP_RIGHT) {
+                        x = fram.getX() + fram.getWidth() - dialog.getWidth() - margin;
+                        y = fram.getY();
+                        top_to_bot = true;
+                        top = y + 20;
+                    } else if (location == Location.TOP_LEFT) {
+                        x = fram.getX() + margin;
+                        y = fram.getY();
+                        top_to_bot = true;
+                        top = y + 20;
+                    } else if (location == Location.BOTTOM_CENTER) {
+                        x = fram.getX() + ((fram.getWidth() - dialog.getWidth()) / 2);
+                        y = fram.getY() + fram.getHeight() - dialog.getHeight();
+                        top_to_bot = false;
+                        top = y;
+                    } else if (location == Location.BOTTOM_RIGHT) {
+                        x = fram.getX() + fram.getWidth() - dialog.getWidth() - margin;
+                        y = fram.getY() + fram.getHeight() - dialog.getHeight();
+                        top_to_bot = false;
+                        top = y;
+                    } else if (location == Location.BOTTOM_LEFT) {
+                        x = fram.getX() + margin;
+                        y = fram.getY() + fram.getHeight() - dialog.getHeight();
+                        top_to_bot = false;
+                        top = y;
+                    } else {
+                        x = fram.getX() + ((fram.getWidth() - dialog.getWidth()) / 2);
+                        y = fram.getY() + ((fram.getHeight() - dialog.getHeight()) / 2); 
+                        top_to_bot = true;
+                        top = y;
+                    }
+                    // Change this line to move below the notification in top
+//                    top = y + 20;
+//                    top = y;
+                    dialog.setLocation(x, y);
+                    dialog.setVisible(true);
+                }
+                
+            }
+
+            @Override
+            public void end() {
+                showing = !showing;
+                if (showing) {
+                    thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sleep();
+                            closeNotification();
+                        }
+                    });
+                    thread.start();
+                } else {
+                    dialog.dispose();
+                }
+            }
+            
+        };
+        
+        animator = new Animator(500, target);
+        animator.setResolution(5);
+        
+    }
+    
+    
+    public void showNotification() {
+        animator.start();
+    }
+    
+    
+    private void closeNotification() {
+        if (thread != null && thread.isAlive()) {
+            thread.interrupt();
+        }
+        if (animator.isRunning()) {
+            if (!showing) {
+                animator.stop();
+                showing = true;
+                animator.start();
+            }
+        } else {
+            showing = true;
+            animator.start();
+        }
+    }
+    
+    
+    private void sleep() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            
+        }
     }
     
     
@@ -43,7 +219,13 @@ public class Notification extends javax.swing.JComponent {
         int height = getHeight() - shadowSize * 2;
         g2.fillRect(x, y, width, height);
         
-        g2.setColor(new Color(18, 163, 24));
+        if (type == Type.SUCCESS) {
+            g2.setColor(new Color(18, 163, 24));
+        } else if (type == Type.INFO) {
+            g2.setColor(new Color(28, 139, 206));
+        } else {
+            g2.setColor(new Color(241, 196, 15));
+        }
         
         g2.fillRect(6, 6, 5, getHeight() - shadowSize * 2);
         g2.dispose();
@@ -166,9 +348,24 @@ public class Notification extends javax.swing.JComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
-        // TODO add your handling code here:
+        closeNotification();
     }//GEN-LAST:event_cmdCloseActionPerformed
 
+    
+    public static enum Type {
+        
+        SUCCESS, INFO, WARNING
+        
+    }
+
+    
+    public static enum Location {
+        
+        TOP_CENTER, TOP_RIGHT, TOP_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, BOTTOM_LEFT, CENTER
+        
+    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdClose;
