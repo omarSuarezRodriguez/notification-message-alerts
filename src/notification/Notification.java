@@ -43,6 +43,9 @@ public class Notification extends javax.swing.JComponent {
         int height = getHeight() - shadowSize * 2;
         g2.fillRect(x, y, width, height);
         
+        g2.setColor(new Color(18, 163, 24));
+        
+        g2.fillRect(6, 6, 5, getHeight() - shadowSize * 2);
         g2.dispose();
         super.paint(grphcs); 
     }
@@ -93,7 +96,7 @@ public class Notification extends javax.swing.JComponent {
         jLabelIcon = new javax.swing.JLabel();
         jPanel = new javax.swing.JPanel();
         jLabelMessage = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        jLabelMessageText = new javax.swing.JLabel();
         cmdClose = new javax.swing.JButton();
 
         jLabelIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -102,9 +105,12 @@ public class Notification extends javax.swing.JComponent {
         jPanel.setOpaque(false);
 
         jLabelMessage.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jLabelMessage.setForeground(new java.awt.Color(38, 38, 38));
         jLabelMessage.setText("Message");
 
-        jLabel1.setText("jLabel1");
+        jLabelMessageText.setFont(new java.awt.Font("SansSerif", 0, 11)); // NOI18N
+        jLabelMessageText.setForeground(new java.awt.Color(127, 127, 127));
+        jLabelMessageText.setText("Message Text");
 
         javax.swing.GroupLayout jPanelLayout = new javax.swing.GroupLayout(jPanel);
         jPanel.setLayout(jPanelLayout);
@@ -113,15 +119,15 @@ public class Notification extends javax.swing.JComponent {
             .addGroup(jPanelLayout.createSequentialGroup()
                 .addGroup(jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabelMessage)
-                    .addComponent(jLabel1))
-                .addGap(0, 234, Short.MAX_VALUE))
+                    .addComponent(jLabelMessageText))
+                .addGap(0, 230, Short.MAX_VALUE))
         );
         jPanelLayout.setVerticalGroup(
             jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelLayout.createSequentialGroup()
                 .addComponent(jLabelMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1))
+                .addGap(3, 3, 3)
+                .addComponent(jLabelMessageText))
         );
 
         cmdClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notification/close.png"))); // NOI18N
@@ -151,16 +157,11 @@ public class Notification extends javax.swing.JComponent {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(jLabelIcon, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelIcon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmdClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(10, 10, 10))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(cmdClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -171,9 +172,9 @@ public class Notification extends javax.swing.JComponent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdClose;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelIcon;
     private javax.swing.JLabel jLabelMessage;
+    private javax.swing.JLabel jLabelMessageText;
     private javax.swing.JPanel jPanel;
     // End of variables declaration//GEN-END:variables
 }
